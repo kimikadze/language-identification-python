@@ -99,7 +99,7 @@ def detect_language(input_text,likelihood,class_proba):
 def main():
     train, labels = get_data(open("x_train.txt"), open("y_train.txt"))
     class_proba = calculate_class_proba(labels)
-    ngram_proba, feature_proba = calculate_conditional(train[:1000], labels[:1000])
+    ngram_proba, feature_proba = calculate_conditional(train, labels)
     likelihood = calculate_likelihood_table(class_proba, ngram_proba, feature_proba)
     while True:
         test = input("Enter your text (press Enter to exit): ")
@@ -111,7 +111,6 @@ def main():
                 print("The language of your document is ", detect_language(test,likelihood,class_proba))
             else:
                 print("Language cannot be reliably identified. Please try another time.")
-                continue
         except ValueError:
             print("Please enter some text...")
 
