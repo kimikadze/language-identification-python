@@ -6,6 +6,7 @@ from operator import itemgetter
 ngram_len = 4
 
 def get_data(train,labels):
+    """get data structures with cleaned train data and labels """
     X = []
     y = []
     for text,label in zip(train,labels):
@@ -22,11 +23,13 @@ def clean_data(doc):
 
 
 def get_ngrams(text,n=int()):
+    """generate n-grams of len n for a given text"""
     gram = [text[i:i+n] for i in range(len(text)-1)]
     return gram
 
 
 def calculate_class_proba(classes):
+    """calculate class prior"""
     class_freq = dict()
     for label in classes:
         if not label in class_freq:
@@ -38,6 +41,7 @@ def calculate_class_proba(classes):
 
 
 def calculate_conditional(train, classes):
+    """calculate conditional probabilities for attributes"""
     frequency_table = defaultdict(list)
     ngram_total_count = dict()
     ngram_overall_proba = dict()
@@ -63,6 +67,7 @@ def calculate_conditional(train, classes):
 
 
 def calculate_likelihood_table(prior, ngram_overall_proba, feature_proba):
+    """get likelihood table"""
     likelihood = defaultdict(dict)
     for k,v in feature_proba.items():
         for key,val in v.items():
@@ -71,6 +76,7 @@ def calculate_likelihood_table(prior, ngram_overall_proba, feature_proba):
 
 
 def map_language(result, table):
+    """map the code of detected language to the language name"""
     language_ids = dict()
     for line in open(table,"r"):
         line = line.strip().split(";")
@@ -78,7 +84,8 @@ def map_language(result, table):
     return language_ids[result]
 
 
-def detect_language(input_text,likelihood,class_proba):
+def detect_language_NB(input_text,likelihood,class_proba):
+    """identify the most probable language for a given text using NB"""
     values = defaultdict(list)
     pre_selector = []
     input_text = get_ngrams(clean_data(input_text),ngram_len)
@@ -101,14 +108,15 @@ def main():
     class_proba = calculate_class_proba(labels)
     ngram_proba, feature_proba = calculate_conditional(train, labels)
     likelihood = calculate_likelihood_table(class_proba, ngram_proba, feature_proba)
+    print("Calculating probabilities. Hang tight!")
     while True:
         test = input("Enter your text (press Enter to exit): ")
         if test == '':
             print("Buy!")
             exit()
         try:
-            if detect_language(test,likelihood,class_proba) != False:
-                print("The language of your document is ", detect_language(test,likelihood,class_proba))
+            if detect_language_NB(test,likelihood,class_proba) != False:
+                print("The language of your document is ", detect_language_NB(test,likelihood,class_proba))
             else:
                 print("Language cannot be reliably identified. Please try another time.")
         except ValueError:
