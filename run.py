@@ -1,6 +1,7 @@
 import re
 from collections import Counter, defaultdict
 from functools import reduce
+from operator import itemgetter
 
 ngram_len = 4
 
@@ -69,23 +70,50 @@ def calculate_likelihood_table(prior, ngram_overall_proba, feature_proba):
     return likelihood
 
 
-train,labels = get_data(open("x_train.txt"),open("y_train.txt"))
-class_proba = calculate_class_proba(labels)
-ngram_proba, feature_proba = calculate_conditional(train[0:20000],labels[0:20000])
-likelihood = calculate_likelihood_table(class_proba,ngram_proba,feature_proba)
+def map_language(result, table):
+    language_ids = dict()
+    for line in open(table,"r"):
+        line = line.strip().split(";")
+        language_ids[line[0]] = line[1]
+    return language_ids[result]
 
-test = get_ngrams("this is very important task I cannot speak right now please call me later",ngram_len)
-print(test)
-values = defaultdict(list)
-for i in test:
-    for language,probas in likelihood.items():
+
+def detect_language(input_text,likelihood,class_proba):
+    values = defaultdict(list)
+    pre_selector = []
+    input_text = get_ngrams(clean_data(input_text),ngram_len)
+    for i in input_text:
+        for language,probas in likelihood.items():
+            try:
+                values[language].append(probas[i])
+            except KeyError:
+                values[language].append(0.0001)
+    for k,v in values.items():
+        pre_selector.append((k,reduce(lambda x, y: x * y, v, 1) * class_proba[k]))
+    if max(pre_selector,key=itemgetter(1))[0] == min(pre_selector,key=itemgetter(1))[0]:
+        return False
+    else:
+        return map_language(max(pre_selector,key=itemgetter(1))[0],'labels.csv')
+
+
+def main():
+    train, labels = get_data(open("x_train.txt"), open("y_train.txt"))
+    class_proba = calculate_class_proba(labels)
+    ngram_proba, feature_proba = calculate_conditional(train[:1000], labels[:1000])
+    likelihood = calculate_likelihood_table(class_proba, ngram_proba, feature_proba)
+    while True:
+        test = input("Enter your text (press Enter to exit): ")
+        if test == '':
+            print("Buy!")
+            exit()
         try:
-            values[language].append(probas[i])
-        except KeyError:
-            values[language].append(0.0001)
+            if detect_language(test,likelihood,class_proba) != False:
+                print("The language of your document is ", detect_language(test,likelihood,class_proba))
+            else:
+                print("Language cannot be reliably identified. Please try another time.")
+                continue
+        except ValueError:
+            print("Please enter some text...")
 
-picker = []
-for k,v in values.items():
-    print(k,reduce(lambda x, y: x * y, v, 1)*class_proba[k])
-    picker.append(reduce(lambda x, y: x * y, v, 1)*class_proba[k])
-print(max(picker))
+
+main()
