@@ -104,11 +104,11 @@ def detect_language_NB(input_text,likelihood,class_proba):
 
 
 def main():
+    print("Calculating probabilities. Hang tight!")
     train, labels = get_data(open("x_train.txt"), open("y_train.txt"))
     class_proba = calculate_class_proba(labels)
     ngram_proba, feature_proba = calculate_conditional(train, labels)
     likelihood = calculate_likelihood_table(class_proba, ngram_proba, feature_proba)
-    print("Calculating probabilities. Hang tight!")
     while True:
         test = input("Enter your text (press Enter to exit): ")
         if test == '':
