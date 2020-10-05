@@ -1,4 +1,4 @@
-# Language Identification
+# Language Identification with Naive Bayes and N-Gram Features
 
 The code implements a language identification solution based on Naive Bayes algorithm and character N-gram features. The method relies on data prepared by [Thoma](https://arxiv.org/pdf/1801.07779.pdf) for building an N-gram language model. The probabilities are calculated using 117,500 sentences from 235 languages.
 
@@ -20,3 +20,5 @@ y_train.txt //labels for training data
 ```
 
 > All files should be in the same directory when running the program.
+
+You can change the N-gram length parameter manually in the code, by editing `ngram_len` variable.
