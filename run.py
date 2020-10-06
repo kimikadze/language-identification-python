@@ -78,7 +78,7 @@ def calculate_likelihood_table(prior, ngram_overall_proba, feature_proba):
 def map_language(result, table):
     """map the code of detected language to the language name"""
     language_ids = dict()
-    for line in open(table,"r"):
+    for line in open(table,"r",encoding="utf-8"):
         line = line.strip().split(";")
         language_ids[line[0]] = line[1]
     return language_ids[result]
@@ -105,7 +105,7 @@ def detect_language_NB(input_text,likelihood,class_proba):
 
 def main():
     print("Calculating probabilities. Hang tight!")
-    train, labels = get_data(open("x_train.txt"), open("y_train.txt"))
+    train, labels = get_data(open("x_train.txt",encoding="utf-8"), open("y_train.txt",encoding="utf-8"))
     class_proba = calculate_class_proba(labels)
     ngram_proba, feature_proba = calculate_conditional(train, labels)
     likelihood = calculate_likelihood_table(class_proba, ngram_proba, feature_proba)
@@ -118,7 +118,7 @@ def main():
             if detect_language_NB(test,likelihood,class_proba) != False:
                 print("The language of your document is ", detect_language_NB(test,likelihood,class_proba))
             else:
-                print("Language cannot be reliably identified. Please try another time.")
+                print("Language cannot be reliably identified. Please try entering a longer text.")
         except ValueError:
             print("Please enter some text...")
 
