@@ -4,7 +4,7 @@ The code implements a language identification solution based on Naive Bayes algo
 
 Run the program: `python run.py`
 
-Wait until the input prompt. It may take up to a couple of minutes, depending on your machine. Enter a text in your preferred language. 
+Wait until the input prompt. It may take up to a couple of minutes, depending on your machine. Enter the text you want to identify. 
 
 > If the input is too short, the program may fail to recognise the language and will ask for a longer input.
 
